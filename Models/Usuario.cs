@@ -10,7 +10,9 @@ namespace ClienteService.Models
 
         public string Email { get; set; }
 
-        public string Senha { get; set; }
+        public string SenhaHash { get; set; }
+
+        public string SenhaSalt { get; set; }
 
         public string Role { get; set; }
 
