@@ -60,6 +60,33 @@ namespace ClienteService.Services
             await _context.Usuarios.AddAsync(usuario);
             await _context.SaveChangesAsync();
         }
+        public async Task UpdateUsuario(Guid id, UsuarioDTO dto)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id);
+
+            if (usuario == null)
+                throw new KeyNotFoundException("Usuário não encontrado.");
+
+            if (string.IsNullOrWhiteSpace(dto.Username))
+                throw new ArgumentException("Username é obrigatório.");
+
+            if (string.IsNullOrWhiteSpace(dto.Email))
+                throw new ArgumentException("Email é obrigatório.");
+
+            usuario.Username = dto.Username;
+            usuario.Email = dto.Email;
+            usuario.Role = dto.Role;
+
+            if (!string.IsNullOrWhiteSpace(dto.Senha))
+            {
+                CreatePasswordHash(dto.Senha, out string hash, out string salt);
+                usuario.SenhaHash = hash;
+                usuario.SenhaSalt = salt;
+            }
+
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+        }
 
         public async Task DeleteUsuario(Guid id)
         {
