@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\zloos\\source\\repos\\ClienteService\\ClienteService\\ClienteService.csproj": {}
+    "C:\\Users\\User\\source\\repos\\ClienteService\\ClienteService\\ClienteService.csproj": {}
   },
   "projects": {
-    "C:\\Users\\zloos\\source\\repos\\ClienteService\\ClienteService\\ClienteService.csproj": {
+    "C:\\Users\\User\\source\\repos\\ClienteService\\ClienteService\\ClienteService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\zloos\\source\\repos\\ClienteService\\ClienteService\\ClienteService.csproj",
+        "projectUniqueName": "C:\\Users\\User\\source\\repos\\ClienteService\\ClienteService\\ClienteService.csproj",
         "projectName": "ClienteService",
-        "projectPath": "C:\\Users\\zloos\\source\\repos\\ClienteService\\ClienteService\\ClienteService.csproj",
-        "packagesPath": "C:\\Users\\zloos\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\zloos\\source\\repos\\ClienteService\\ClienteService\\obj\\",
+        "projectPath": "C:\\Users\\User\\source\\repos\\ClienteService\\ClienteService\\ClienteService.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\User\\source\\repos\\ClienteService\\ClienteService\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\zloos\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -50,41 +50,9 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
-            "Microsoft.AspNetCore.Authentication.JwtBearer": {
-              "target": "Package",
-              "version": "[8.0.13, )"
-            },
-            "Microsoft.EntityFrameworkCore": {
-              "target": "Package",
-              "version": "[8.0.13, )"
-            },
-            "Microsoft.EntityFrameworkCore.Design": {
-              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[8.0.13, )"
-            },
-            "Microsoft.EntityFrameworkCore.Relational": {
-              "target": "Package",
-              "version": "[8.0.13, )"
-            },
-            "Microsoft.EntityFrameworkCore.Tools": {
-              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[8.0.13, )"
-            },
-            "Pomelo.EntityFrameworkCore.MySql": {
-              "target": "Package",
-              "version": "[8.0.0, )"
-            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.6.2, )"
-            },
-            "System.IdentityModel.Tokens.Jwt": {
-              "target": "Package",
-              "version": "[8.16.0, )"
             }
           },
           "imports": [
@@ -106,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.204/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
