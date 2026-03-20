@@ -1,0 +1,33 @@
+# Build
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+logs/
+
+# Rider / VSCode
+.idea/
+.vscode/
+
+# Publish
+publish/
+*.publishsettings
+
+# ASP.NET
+appsettings.Development.json
+
+# Nuget
+*.nupkg
+packages/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -42,7 +42,11 @@ namespace ClienteService.Controllers
                 return StatusCode(500, "Erro ao buscar usuário.");
             }
         }
+<<<<<<< HEAD
 
+=======
+        [AllowAnonymous]
+>>>>>>> 1b2f2d5 (feat: adiciona o AuthService no Program)
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] UsuarioDTO dto)
         {

@@ -21,6 +21,7 @@ options.UseMySql(connection, ServerVersion.AutoDetect(connection)));
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ClienteService.Services.ClienteService>();
 builder.Services.AddScoped<EnderecoService>();
+builder.Services.AddScoped<AuthService>();
 
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
 
