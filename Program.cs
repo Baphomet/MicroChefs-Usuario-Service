@@ -3,6 +3,7 @@ using ClienteService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Steeltoe.Discovery.Eureka;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,8 @@ builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ClienteService.Services.ClienteService>();
 builder.Services.AddScoped<EnderecoService>();
 builder.Services.AddScoped<AuthService>();
+
+builder.Services.AddEurekaDiscoveryClient();
 
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
 
