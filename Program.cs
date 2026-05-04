@@ -23,6 +23,8 @@ builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ClienteService.Services.ClienteService>();
 builder.Services.AddScoped<EnderecoService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<HistoricoPedidoService>();
+builder.Services.AddHostedService<PedidoStatusConsumer>();
 
 builder.Services.AddEurekaDiscoveryClient();
 
