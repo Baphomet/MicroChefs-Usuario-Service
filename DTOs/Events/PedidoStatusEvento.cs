@@ -1,9 +1,14 @@
-﻿namespace ClienteService.DTOs.Eventos
+﻿namespace ClienteService.DTOs.Eventos;
+using System.Text.Json.Serialization;
+
+public class PedidoStatusEvento
 {
-    public class PedidoStatusEvento
-    {
-        public long Id { get; set; }
-        public long UsuarioId { get; set; }
-        public string StatusPedido { get; set; }
-    }
+    [JsonPropertyName("id")]
+    public long Id { get; set; }
+
+    [JsonPropertyName("usuarioId")]
+    public long UsuarioId { get; set; }
+
+    [JsonPropertyName("statusPedido")]
+    public string StatusPedido { get; set; }
 }
