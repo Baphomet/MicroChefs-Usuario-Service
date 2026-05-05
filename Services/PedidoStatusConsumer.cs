@@ -20,7 +20,7 @@ namespace ClienteService.Services
             _configuration = configuration;
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var uri = _configuration["RabbitMQ:Uri"];
 
@@ -32,16 +32,16 @@ namespace ClienteService.Services
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
 
-            channel.ExchangeDeclare("pedido-exchange", ExchangeType.Direct, true);
+            channel.ExchangeDeclare("pedido-exchange", ExchangeType.Topic, true);
             channel.ExchangeDeclare("pedido-dlx", ExchangeType.Direct, true);
 
             channel.QueueDeclare("cliente-dlq", true, false, false);
             channel.QueueBind("cliente-dlq", "pedido-dlx", "pedido-key.update");
 
             var args = new Dictionary<string, object>
-            {
-                { "x-dead-letter-exchange", "pedido-dlx" }
-            };
+    {
+        { "x-dead-letter-exchange", "pedido-dlx" }
+    };
 
             channel.QueueDeclare("cliente-queue", true, false, false, args);
             channel.QueueBind("cliente-queue", "pedido-exchange", "pedido-key.update");
@@ -53,6 +53,7 @@ namespace ClienteService.Services
                 try
                 {
                     var json = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    Console.WriteLine($"Recebido: {json}");
 
                     var evento = JsonSerializer.Deserialize<PedidoStatusEvento>(json);
 
@@ -80,8 +81,7 @@ namespace ClienteService.Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Erro: {ex.Message}");
-
+                    Console.WriteLine(ex.ToString());
                     channel.BasicNack(ea.DeliveryTag, false, false);
                 }
             };
@@ -90,7 +90,7 @@ namespace ClienteService.Services
 
             Console.WriteLine("Consumer rodando...");
 
-            return Task.CompletedTask;
+            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
     }
 }
