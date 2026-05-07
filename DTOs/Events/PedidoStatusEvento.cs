@@ -1,4 +1,4 @@
-﻿namespace ClienteService.DTOs.Eventos;
+﻿namespace ClienteService.DTOs.Events;
 using System.Text.Json.Serialization;
 
 public class PedidoStatusEvento
