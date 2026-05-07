@@ -21,9 +21,9 @@ namespace ClienteService.Migrations
 
             modelBuilder.Entity("ClienteService.Models.Cliente", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Cpf")
                         .IsRequired()
@@ -47,8 +47,8 @@ namespace ClienteService.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("char(36)");
+                    b.Property<long>("UsuarioId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -60,9 +60,9 @@ namespace ClienteService.Migrations
 
             modelBuilder.Entity("ClienteService.Models.Endereco", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Bairro")
                         .IsRequired()
@@ -76,8 +76,8 @@ namespace ClienteService.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("ClienteId")
-                        .HasColumnType("char(36)");
+                    b.Property<long>("ClienteId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Complemento")
                         .IsRequired()
@@ -104,9 +104,9 @@ namespace ClienteService.Migrations
 
             modelBuilder.Entity("ClienteService.Models.HistoricoPedido", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("DataAtualizacao")
                         .HasColumnType("datetime(6)");
@@ -118,8 +118,8 @@ namespace ClienteService.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("char(36)");
+                    b.Property<long>("UsuarioId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -128,9 +128,9 @@ namespace ClienteService.Migrations
 
             modelBuilder.Entity("ClienteService.Models.Usuario", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime(6)");
