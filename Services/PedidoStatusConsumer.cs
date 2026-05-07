@@ -59,17 +59,12 @@ namespace ClienteService.Services
                 routingKey: "pedido.key-updates"
             );
 
-            var args = new Dictionary<string, object>
-            {
-                { "x-dead-letter-exchange", "pedido-dlx" }
-            };
-
             channel.QueueDeclare(
                 queue: "service-queue",
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
-                arguments: args
+                arguments: null
             );
 
             channel.QueueBind(
