@@ -21,7 +21,7 @@ namespace ClienteService.Services
                 .ToListAsync();
         }
 
-        public async Task<Endereco> GetEnderecoById(Guid id)
+        public async Task<Endereco> GetEnderecoById(long id)
         {
             var endereco = await _context.Enderecos
                 .Include(e => e.Cliente)
@@ -64,7 +64,7 @@ namespace ClienteService.Services
             }
         }
 
-        public async Task UpdateEndereco(Guid id, EnderecoDTO dto)
+        public async Task UpdateEndereco(long id, EnderecoDTO dto)
         {
             var endereco = await _context.Enderecos.FirstOrDefaultAsync(e => e.Id == id);
 
@@ -93,7 +93,7 @@ namespace ClienteService.Services
             }
         }
 
-        public async Task DeleteEndereco(Guid id)
+        public async Task DeleteEndereco(long id)
         {
             var endereco = await _context.Enderecos.FindAsync(id);
 

@@ -4,7 +4,7 @@ namespace ClienteService.Models
 {
     public class Usuario
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public long Id { get; set; }
 
         public string Username { get; set; }
 

@@ -14,6 +14,6 @@
 
         public DateTime DataCadastro { get; set; }
 
-        public Guid UsuarioId { get; set; }
+        public long UsuarioId { get; set; }
     }
 }

@@ -13,12 +13,12 @@ namespace ClienteService.Services
             _db = db;
         }
 
-        public async Task SalvarAsync(long pedidoId, Guid usuarioId, string status, CancellationToken cancellationToken = default)
+        public async Task SalvarAsync(long pedidoId, long usuarioId, string status, CancellationToken cancellationToken = default)
         {
             if (pedidoId <= 0)
                 throw new ArgumentException("PedidoId inválido");
 
-            if (usuarioId == Guid.Empty)
+            if (usuarioId == 0)
                 throw new ArgumentException("UsuarioId inválido");
 
             if (string.IsNullOrWhiteSpace(status))

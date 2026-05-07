@@ -105,11 +105,10 @@ namespace ClienteService.Services
                         var historicoService = scope.ServiceProvider
                             .GetRequiredService<HistoricoPedidoService>();
 
-                        var usuarioId = Guid.NewGuid(); // temp
 
                         await historicoService.SalvarAsync(
                             evento.Id,
-                            usuarioId,
+                            evento.UsuarioId,
                             evento.StatusPedido,
                             stoppingToken
                         );

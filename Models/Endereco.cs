@@ -4,7 +4,7 @@ namespace ClienteService.Models
 {
     public class Endereco
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public long Id { get; set; }
 
         public string Rua { get; set; }
 
@@ -20,7 +20,7 @@ namespace ClienteService.Models
 
         public string Cep { get; set; }
 
-        public Guid ClienteId { get; set; }
+        public long ClienteId { get; set; }
 
         [JsonIgnore]
         public Cliente Cliente { get; set; }

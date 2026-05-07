@@ -26,7 +26,7 @@ namespace ClienteService.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById(long id)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace ClienteService.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] ClienteDTO dto)
+        public async Task<IActionResult> Update(long id, [FromBody] ClienteDTO dto)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace ClienteService.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(long id)
         {
             try
             {

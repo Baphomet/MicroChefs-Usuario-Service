@@ -22,7 +22,7 @@ namespace ClienteService.Services
                 .ToListAsync();
         }
 
-        public async Task<Cliente> GetClienteById(Guid Id)
+        public async Task<Cliente> GetClienteById(long Id)
         {
             var cliente = await _context.Clientes
                 .Include(c => c.Usuario)
@@ -65,7 +65,7 @@ namespace ClienteService.Services
             }
         }
 
-        public async Task UpdateCliente(Guid Id, ClienteDTO dto)
+        public async Task UpdateCliente(long Id, ClienteDTO dto)
         {
             var cliente = await _context.Clientes.FirstOrDefaultAsync(c => c.Id == Id);
 
@@ -92,7 +92,7 @@ namespace ClienteService.Services
             }
         }
 
-        public async Task DeleteCliente(Guid Id)
+        public async Task DeleteCliente(long Id)
         {
             var cliente = await _context.Clientes.FindAsync(Id);
 

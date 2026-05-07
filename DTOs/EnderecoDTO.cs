@@ -16,6 +16,6 @@
 
         public string Cep { get; set; }
 
-        public Guid ClienteId { get; set; }
+        public long ClienteId { get; set; }
     }
 }

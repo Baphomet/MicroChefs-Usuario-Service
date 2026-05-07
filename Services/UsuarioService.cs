@@ -23,7 +23,7 @@ namespace ClienteService.Services
                 .ToListAsync();
         }
 
-        public async Task<Usuario> GetUsuarioById(Guid id)
+        public async Task<Usuario> GetUsuarioById(long id)
         {
             var usuario = await _context.Usuarios
                 .Include(u => u.Cliente)
@@ -60,7 +60,7 @@ namespace ClienteService.Services
             await _context.Usuarios.AddAsync(usuario);
             await _context.SaveChangesAsync();
         }
-        public async Task UpdateUsuario(Guid id, UsuarioDTO dto)
+        public async Task UpdateUsuario(long id, UsuarioDTO dto)
         {
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id);
 
@@ -88,7 +88,7 @@ namespace ClienteService.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteUsuario(Guid id)
+        public async Task DeleteUsuario(long id)
         {
             var usuario = await _context.Usuarios.FindAsync(id);
 
