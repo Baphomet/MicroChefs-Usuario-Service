@@ -1,21 +1,21 @@
 ﻿using ClienteService.DTOs.Events;
 using ClienteService.Exceptions;
-using ClienteService.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Polly;
+using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
 
-namespace ClienteService.Consumers
+namespace ClienteService.Services
 {
     public class PedidoStatusConsumer : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
+        private readonly UserProducer _userProducer;
 
         private const string Exchange = "pedido-exchange";
         private const string DlqExchange = "dead-letter-exchange";
@@ -24,10 +24,12 @@ namespace ClienteService.Consumers
 
         public PedidoStatusConsumer(
             IServiceProvider serviceProvider,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            UserProducer userProducer)
         {
             _serviceProvider = serviceProvider;
             _configuration = configuration;
+            _userProducer = userProducer;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -52,10 +54,9 @@ namespace ClienteService.Consumers
                     retryCount: 3,
                     sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
                     onRetry: (exception, timeSpan, retryCount, context) =>
-        {
-            Console.WriteLine($"[RETRY] Tentativa {retryCount} falhou por erro de infra: {exception.Message}. Tentando novamente em {timeSpan.TotalSeconds}s...");
-        });
-
+                    {
+                        Console.WriteLine($"[RETRY] Tentativa {retryCount} falhou por erro de infra: {exception.Message}. Tentando novamente em {timeSpan.TotalSeconds}s...");
+                    });
 
             consumer.Received += async (model, ea) =>
             {
@@ -71,23 +72,24 @@ namespace ClienteService.Consumers
                     {
                         await ProcessarEventoAsync(evento, stoppingToken);
                     });
+
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
                 catch (DataException ex)
                 {
-                    await ProcessarErroAsync(channel, ex, json, "DATA_ERROR");
+                    _userProducer.EnviarParaDlq(channel, Queue, ex, json, "DATA_ERROR");
 
                     channel.BasicNack(ea.DeliveryTag, false, false);
                 }
                 catch (InfraException ex)
                 {
-                    await ProcessarErroAsync(channel, ex, json, "INFRA_ERROR");
+                    _userProducer.EnviarParaDlq(channel, Queue, ex, json, "INFRA_ERROR");
 
                     channel.BasicNack(ea.DeliveryTag, false, false);
                 }
                 catch (Exception ex)
                 {
-                    await ProcessarErroAsync(channel, ex, json, "INFRA_ERROR");
+                    _userProducer.EnviarParaDlq(channel, Queue, ex, json, "INFRA_ERROR");
 
                     channel.BasicNack(ea.DeliveryTag, false, false);
                 }
@@ -184,40 +186,6 @@ namespace ClienteService.Consumers
             }
         }
 
-        private Task ProcessarErroAsync(
-            IModel channel,
-            Exception ex,
-            string json,
-            string tipoErro)
-        {
-            var dlq = new DLQSupportDTO(
-                TipoMensagem: "PEDIDO_STATUS_UPDATE",
-                FilaDeOrigem: Queue,
-                TipoErro: tipoErro,
-                MensagemDeErro: ex.Message,
-                MensagemOriginal: json,
-                TimeStamp: DateTime.UtcNow
-            );
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var body = Encoding.UTF8.GetBytes(
-                JsonSerializer.Serialize(dlq, options)
-            );
-
-            channel.BasicPublish(
-                exchange: "dead-letter-exchange",
-                routingKey: "dead-message",
-                basicProperties: null,
-                body: body
-            );
-
-            Console.WriteLine($"[DLQ] {JsonSerializer.Serialize(dlq)}");
-
-            return Task.CompletedTask;
-        }
     }
 }
