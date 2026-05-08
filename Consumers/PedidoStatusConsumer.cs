@@ -1,5 +1,6 @@
 ﻿using ClienteService.DTOs.Events;
 using ClienteService.Exceptions;
+using ClienteService.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,7 +10,7 @@ using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
 
-namespace ClienteService.Services
+namespace ClienteService.Consumers
 {
     public class PedidoStatusConsumer : BackgroundService
     {
