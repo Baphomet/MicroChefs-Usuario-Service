@@ -24,6 +24,15 @@ namespace ClienteService.Services
             if (string.IsNullOrWhiteSpace(status))
                 throw new ArgumentException("Status inválido");
 
+            var jaProcessado = await _db.HistoricoPedidos
+                .AnyAsync(h => h.PedidoId == pedidoId && h.Status == status, cancellationToken);
+
+            if (jaProcessado)
+            {
+                Console.WriteLine($"O status '{status}' do pedido {pedidoId} já foi processado anteriormente. Ignorando duplicidade.");
+                return;
+            }
+
             var historico = new HistoricoPedido
             {
                 PedidoId = pedidoId,
