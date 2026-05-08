@@ -3,6 +3,7 @@ using ClienteService.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Polly;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -16,9 +17,9 @@ namespace ClienteService.Services
         private readonly IConfiguration _configuration;
 
         private const string Exchange = "pedido-exchange";
-        private const string DlqExchange = "pedido-dlx";
-        private const string Queue = "service-queue";
-        private const string RoutingKey = "pedido.key-updates";
+        private const string DlqExchange = "dead-letter-exchange";
+        private const string Queue = "user-queue";
+        private const string RoutingKey = "pedido-key.status";
 
         public PedidoStatusConsumer(
             IServiceProvider serviceProvider,
@@ -44,6 +45,17 @@ namespace ClienteService.Services
 
             var consumer = new EventingBasicConsumer(channel);
 
+            var retryPolicy = Policy
+                .Handle<InfraException>()
+                .WaitAndRetryAsync(
+                    retryCount: 3,
+                    sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                    onRetry: (exception, timeSpan, retryCount, context) =>
+        {
+            Console.WriteLine($"[RETRY] Tentativa {retryCount} falhou por erro de infra: {exception.Message}. Tentando novamente em {timeSpan.TotalSeconds}s...");
+        });
+
+
             consumer.Received += async (model, ea) =>
             {
                 var json = Encoding.UTF8.GetString(ea.Body.ToArray());
@@ -54,8 +66,10 @@ namespace ClienteService.Services
 
                     var evento = ConverterMensagem(json);
 
-                    await ProcessarEventoAsync(evento, stoppingToken);
-
+                    await retryPolicy.ExecuteAsync(async () =>
+                    {
+                        await ProcessarEventoAsync(evento, stoppingToken);
+                    });
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
                 catch (DataException ex)
@@ -93,14 +107,14 @@ namespace ClienteService.Services
         {
             channel.ExchangeDeclare(Exchange, ExchangeType.Topic, true);
 
-            channel.ExchangeDeclare(DlqExchange, ExchangeType.Direct, true);
+            channel.ExchangeDeclare(DlqExchange, ExchangeType.Topic, true);
 
-            channel.QueueDeclare("cliente-dlq", true, false, false);
+            channel.QueueDeclare("dead-letter-queue", true, false, false);
 
             channel.QueueBind(
-                "cliente-dlq",
-                DlqExchange,
-                RoutingKey
+                "dead-letter-queue",
+                "dead-letter-exchange",
+                "dead-message"
             );
 
             channel.QueueDeclare(
@@ -184,13 +198,18 @@ namespace ClienteService.Services
                 TimeStamp: DateTime.UtcNow
             );
 
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
             var body = Encoding.UTF8.GetBytes(
-                JsonSerializer.Serialize(dlq)
+                JsonSerializer.Serialize(dlq, options)
             );
 
             channel.BasicPublish(
-                exchange: DlqExchange,
-                routingKey: RoutingKey,
+                exchange: "dead-letter-exchange",
+                routingKey: "dead-message",
                 basicProperties: null,
                 body: body
             );
