@@ -1,4 +1,4 @@
-﻿using ClienteService.DTOs;
+using ClienteService.DTOs;
 using ClienteService.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +21,7 @@ namespace ClienteService.Controllers
             try
             {
                 var token = await _service.Login(dto);
-                return Ok(new { token });
+                return Ok(new { token, email = dto.Email });
             }
             catch (UnauthorizedAccessException ex)
             {
