@@ -22,17 +22,29 @@ namespace ClienteService.Services
 
         public async Task<string> Login(LoginDTO dto)
         {
-            var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Email == dto.Email);
-
-            if (usuario == null)
+            var email = NormalizeEmail(dto.Email);
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(dto.Senha))
                 throw new UnauthorizedAccessException("Usuário ou senha inválidos.");
 
-            if (!VerifyPassword(dto.Senha, usuario.SenhaHash, usuario.SenhaSalt))
+            var usuarios = await _context.Usuarios
+                .Where(u => u.Email.ToLower() == email)
+                .OrderByDescending(u => u.Id)
+                .ToListAsync();
+
+            if (usuarios.Count == 0)
                 throw new UnauthorizedAccessException("Usuário ou senha inválidos.");
 
-            return GenerateToken(usuario);
+            foreach (var usuario in usuarios)
+            {
+                if (VerifyPassword(dto.Senha, usuario.SenhaHash, usuario.SenhaSalt))
+                    return GenerateToken(usuario);
+            }
+
+            throw new UnauthorizedAccessException("Usuário ou senha inválidos.");
         }
+
+        private static string NormalizeEmail(string? email) =>
+            email?.Trim().ToLowerInvariant() ?? string.Empty;
 
         private bool VerifyPassword(string senha, string hash, string salt)
         {

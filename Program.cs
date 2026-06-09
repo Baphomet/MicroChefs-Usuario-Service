@@ -60,6 +60,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<Db>();
+    await dbContext.Database.ExecuteSqlRawAsync("""
+        DELETE u1 FROM Usuarios u1
+        INNER JOIN Usuarios u2 ON u1.Email = u2.Email AND u1.Id < u2.Id
+        """);
     dbContext.Database.Migrate();
 }
 
@@ -70,7 +74,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 

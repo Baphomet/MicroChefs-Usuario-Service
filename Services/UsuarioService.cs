@@ -40,18 +40,24 @@ namespace ClienteService.Services
             if (string.IsNullOrWhiteSpace(dto.Username))
                 throw new ArgumentException("Username é obrigatório.");
 
-            if (string.IsNullOrWhiteSpace(dto.Email))
+            var email = NormalizeEmail(dto.Email);
+            if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException("Email é obrigatório.");
 
             if (string.IsNullOrWhiteSpace(dto.Senha))
                 throw new ArgumentException("Senha é obrigatória.");
 
+            var emailEmUso = await _context.Usuarios
+                .AnyAsync(u => u.Email.ToLower() == email);
+            if (emailEmUso)
+                throw new InvalidOperationException("Este email já está cadastrado. Faça login.");
+
             CreatePasswordHash(dto.Senha, out string hash, out string salt);
 
             var usuario = new Usuario
             {
-                Username = dto.Username,
-                Email = dto.Email,
+                Username = dto.Username.Trim(),
+                Email = email,
                 SenhaHash = hash,
                 SenhaSalt = salt,
                 Role = dto.Role
@@ -98,6 +104,9 @@ namespace ClienteService.Services
             _context.Usuarios.Remove(usuario);
             await _context.SaveChangesAsync();
         }
+
+        private static string NormalizeEmail(string? email) =>
+            email?.Trim().ToLowerInvariant() ?? string.Empty;
 
         private void CreatePasswordHash(string senha, out string hash, out string salt)
         {

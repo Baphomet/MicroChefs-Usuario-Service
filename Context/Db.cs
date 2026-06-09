@@ -11,5 +11,13 @@ namespace ClienteService.Context
         public DbSet<Endereco> Enderecos { get; set; }
         public DbSet<HistoricoPedido> HistoricoPedidos { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Usuario>(entity =>
+            {
+                entity.Property(u => u.Email).HasMaxLength(256);
+                entity.HasIndex(u => u.Email).IsUnique();
+            });
+        }
     }
 }

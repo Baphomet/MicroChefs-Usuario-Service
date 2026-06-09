@@ -56,6 +56,10 @@ namespace ClienteService.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
             catch (DbUpdateException)
             {
                 return StatusCode(500, "Erro ao acessar o banco de dados.");
