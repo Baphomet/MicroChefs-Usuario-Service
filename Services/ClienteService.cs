@@ -35,6 +35,14 @@ namespace ClienteService.Services
             return cliente;
         }
 
+        public async Task<Cliente?> GetClienteByUsuarioId(int usuarioId)
+        {
+            return await _context.Clientes
+                .Include(c => c.Usuario)
+                .Include(c => c.Enderecos)
+                .FirstOrDefaultAsync(c => c.UsuarioId == usuarioId);
+        }
+
         public async Task AddCliente(ClienteDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Nome))
@@ -49,8 +57,8 @@ namespace ClienteService.Services
                 Email = dto.Email,
                 Telefone = dto.Telefone,
                 Cpf = dto.Cpf,
-                DataNascimento = dto.DataNascimento,
-                DataCadastro = dto.DataCadastro,
+                DataNascimento = dto.DataNascimento == default ? DateTime.UtcNow.Date : dto.DataNascimento,
+                DataCadastro = dto.DataCadastro == default ? DateTime.UtcNow : dto.DataCadastro,
                 UsuarioId = dto.UsuarioId
             };
 
