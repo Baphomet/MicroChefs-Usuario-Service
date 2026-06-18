@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace ClienteService.Models
 {
@@ -21,6 +21,10 @@ namespace ClienteService.Models
         public string Cep { get; set; }
 
         public long ClienteId { get; set; }
+
+        public double? Latitude { get; set; }
+
+        public double? Longitude { get; set; }
 
         [JsonIgnore]
         public Cliente Cliente { get; set; }
