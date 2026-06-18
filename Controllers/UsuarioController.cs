@@ -1,4 +1,4 @@
-﻿using ClienteService.DTOs;
+using ClienteService.DTOs;
 using ClienteService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +18,7 @@ namespace ClienteService.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -66,6 +67,7 @@ namespace ClienteService.Controllers
             }
         }
 
+        [Authorize(Roles = "ADMIN")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(long id, [FromBody] UsuarioDTO dto)
         {
@@ -107,6 +109,25 @@ namespace ClienteService.Controllers
             catch (DbUpdateException)
             {
                 return StatusCode(500, "Erro ao acessar o banco de dados.");
+            }
+        }
+
+        [Authorize(Roles = "MOTOBOY,ADMIN")]
+        [HttpPost("{id}/localizacao")]
+        public async Task<IActionResult> UpdateLocalizacao(long id, [FromBody] LocalizacaoDTO dto)
+        {
+            try
+            {
+                await _service.UpdateLocalizacao(id, dto.Latitude, dto.Longitude);
+                return Ok("Localização atualizada com sucesso.");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Erro ao atualizar localização.");
             }
         }
     }
