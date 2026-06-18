@@ -1,4 +1,4 @@
-﻿using ClienteService.Models;
+using ClienteService.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClienteService.Context
@@ -10,6 +10,7 @@ namespace ClienteService.Context
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Endereco> Enderecos { get; set; }
         public DbSet<HistoricoPedido> HistoricoPedidos { get; set; }
+        public DbSet<SystemSettings> Settings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
