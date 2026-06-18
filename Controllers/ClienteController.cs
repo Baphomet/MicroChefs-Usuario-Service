@@ -1,8 +1,9 @@
-﻿using ClienteService.DTOs;
+using ClienteService.DTOs;
 using ClienteService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ClienteService.Controllers
 {
@@ -21,8 +22,19 @@ namespace ClienteService.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var clientes = await _service.GetAllClientes();
-            return Ok(clientes);
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? User.FindFirst("role")?.Value ?? string.Empty;
+            if (role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
+            {
+                var clientes = await _service.GetAllClientes();
+                return Ok(clientes);
+            }
+
+            var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            if (!int.TryParse(usuarioId, out var uid))
+                return Ok(Array.Empty<object>());
+
+            var cliente = await _service.GetClienteByUsuarioId(uid);
+            return Ok(cliente != null ? new[] { cliente } : Array.Empty<object>());
         }
 
         [HttpGet("{id}")]
@@ -31,6 +43,9 @@ namespace ClienteService.Controllers
             try
             {
                 var cliente = await _service.GetClienteById(id);
+                if (!CanAccessCliente(cliente.UsuarioId))
+                    return Forbid();
+
                 return Ok(cliente);
             }
             catch (KeyNotFoundException ex)
@@ -48,6 +63,10 @@ namespace ClienteService.Controllers
         {
             try
             {
+                var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+                if (int.TryParse(usuarioId, out var uid) && dto.UsuarioId != uid)
+                    return Forbid();
+
                 await _service.AddCliente(dto);
                 return StatusCode(201, "Cliente criado com sucesso.");
             }
@@ -66,6 +85,10 @@ namespace ClienteService.Controllers
         {
             try
             {
+                var cliente = await _service.GetClienteById(id);
+                if (!CanAccessCliente(cliente.UsuarioId))
+                    return Forbid();
+
                 await _service.UpdateCliente(id, dto);
                 return Ok("Cliente atualizado com sucesso.");
             }
@@ -88,6 +111,10 @@ namespace ClienteService.Controllers
         {
             try
             {
+                var cliente = await _service.GetClienteById(id);
+                if (!CanAccessCliente(cliente.UsuarioId))
+                    return Forbid();
+
                 await _service.DeleteCliente(id);
                 return Ok("Cliente deletado com sucesso.");
             }
@@ -103,6 +130,16 @@ namespace ClienteService.Controllers
             {
                 return StatusCode(500, "Erro ao acessar o banco de dados.");
             }
+        }
+
+        private bool CanAccessCliente(long usuarioId)
+        {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? User.FindFirst("role")?.Value ?? string.Empty;
+            if (role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            return int.TryParse(claim, out var uid) && uid == usuarioId;
         }
     }
 }
