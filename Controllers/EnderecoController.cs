@@ -1,8 +1,9 @@
-﻿using ClienteService.DTOs;
+using ClienteService.DTOs;
 using ClienteService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ClienteService.Controllers
 {
@@ -21,8 +22,19 @@ namespace ClienteService.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var enderecos = await _service.GetAllEnderecos();
-            return Ok(enderecos);
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? User.FindFirst("role")?.Value ?? string.Empty;
+            if (role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
+            {
+                var enderecos = await _service.GetAllEnderecos();
+                return Ok(enderecos);
+            }
+
+            var clienteId = ResolveClienteId();
+            if (clienteId == null)
+                return Ok(Array.Empty<object>());
+
+            var doCliente = await _service.GetEnderecosByClienteId(clienteId.Value);
+            return Ok(doCliente);
         }
 
         [HttpGet("{id}")]
@@ -31,6 +43,9 @@ namespace ClienteService.Controllers
             try
             {
                 var endereco = await _service.GetEnderecoById(id);
+                if (!CanAccessEndereco(endereco.ClienteId))
+                    return Forbid();
+
                 return Ok(endereco);
             }
             catch (KeyNotFoundException ex)
@@ -48,6 +63,10 @@ namespace ClienteService.Controllers
         {
             try
             {
+                var clienteId = ResolveClienteId();
+                if (clienteId == null || dto.ClienteId != clienteId)
+                    return Forbid();
+
                 await _service.AddEndereco(dto);
                 return StatusCode(201, "Endereço criado com sucesso.");
             }
@@ -66,6 +85,13 @@ namespace ClienteService.Controllers
         {
             try
             {
+                var existing = await _service.GetEnderecoById(id);
+                if (!CanAccessEndereco(existing.ClienteId))
+                    return Forbid();
+
+                if (ResolveClienteId() is long clienteId && dto.ClienteId != clienteId)
+                    return Forbid();
+
                 await _service.UpdateEndereco(id, dto);
                 return Ok("Endereço atualizado com sucesso.");
             }
@@ -88,6 +114,10 @@ namespace ClienteService.Controllers
         {
             try
             {
+                var existing = await _service.GetEnderecoById(id);
+                if (!CanAccessEndereco(existing.ClienteId))
+                    return Forbid();
+
                 await _service.DeleteEndereco(id);
                 return Ok("Endereço deletado com sucesso.");
             }
@@ -103,6 +133,23 @@ namespace ClienteService.Controllers
             {
                 return StatusCode(500, "Erro ao acessar o banco de dados.");
             }
+        }
+
+        private long? ResolveClienteId()
+        {
+            var claim = User.FindFirst("ClienteId")?.Value ?? User.FindFirst("clienteId")?.Value;
+            if (long.TryParse(claim, out var id))
+                return id;
+            return null;
+        }
+
+        private bool CanAccessEndereco(long clienteId)
+        {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? User.FindFirst("role")?.Value ?? string.Empty;
+            if (role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return ResolveClienteId() == clienteId;
         }
     }
 }
