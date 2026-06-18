@@ -1,4 +1,4 @@
-﻿using ClienteService.Context;
+using ClienteService.Context;
 using ClienteService.DTOs;
 using ClienteService.Models;
 using Microsoft.EntityFrameworkCore;
@@ -102,6 +102,20 @@ namespace ClienteService.Services
                 throw new KeyNotFoundException("Usuário não encontrado.");
 
             _context.Usuarios.Remove(usuario);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateLocalizacao(long id, double lat, double lng)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id);
+            if (usuario == null)
+                throw new KeyNotFoundException("Usuário não encontrado.");
+
+            usuario.Latitude = lat;
+            usuario.Longitude = lng;
+
+            _context.Entry(usuario).Property(u => u.Latitude).IsModified = true;
+            _context.Entry(usuario).Property(u => u.Longitude).IsModified = true;
             await _context.SaveChangesAsync();
         }
 
