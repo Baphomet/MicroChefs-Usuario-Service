@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace ClienteService.Models
 {
@@ -10,8 +10,10 @@ namespace ClienteService.Models
 
         public string Email { get; set; }
 
+        [JsonIgnore]
         public string SenhaHash { get; set; }
 
+        [JsonIgnore]
         public string SenhaSalt { get; set; }
 
         public string Role { get; set; }
@@ -20,5 +22,9 @@ namespace ClienteService.Models
 
         [JsonIgnore]
         public Cliente Cliente { get; set; }
+
+        public double? Latitude { get; set; }
+
+        public double? Longitude { get; set; }
     }
 }
