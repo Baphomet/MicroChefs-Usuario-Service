@@ -1,4 +1,4 @@
-﻿namespace ClienteService.DTOs
+namespace ClienteService.DTOs
 {
     public class UsuarioDTO
     {
@@ -11,5 +11,9 @@
         public string Role { get; set; }
 
         public DateTime DataCriacao { get; set; } = DateTime.UtcNow;
+
+        public double? Latitude { get; set; }
+
+        public double? Longitude { get; set; }
     }
 }

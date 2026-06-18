@@ -1,4 +1,4 @@
-﻿namespace ClienteService.DTOs
+namespace ClienteService.DTOs
 {
     public class EnderecoDTO
     {
@@ -17,5 +17,9 @@
         public string Cep { get; set; }
 
         public long ClienteId { get; set; }
+
+        public double? Latitude { get; set; }
+
+        public double? Longitude { get; set; }
     }
 }
