@@ -1,9 +1,14 @@
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using ClienteService.Context;
 
 #nullable disable
 
 namespace ClienteService.Migrations
 {
+    [DbContext(typeof(Db))]
+    [Migration("20260609020000_UniqueUsuarioEmail")]
     /// <inheritdoc />
     public partial class UniqueUsuarioEmail : Migration
     {
