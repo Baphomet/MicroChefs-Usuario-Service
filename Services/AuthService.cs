@@ -1,4 +1,4 @@
-﻿using ClienteService.Context;
+using ClienteService.Context;
 using ClienteService.DTOs;
 using ClienteService.Models;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +37,7 @@ namespace ClienteService.Services
             foreach (var usuario in usuarios)
             {
                 if (VerifyPassword(dto.Senha, usuario.SenhaHash, usuario.SenhaSalt))
-                    return GenerateToken(usuario);
+                    return await GenerateToken(usuario);
             }
 
             throw new UnauthorizedAccessException("Usuário ou senha inválidos.");
@@ -57,7 +57,15 @@ namespace ClienteService.Services
             return Convert.ToBase64String(computedHash) == hash;
         }
 
-        private string GenerateToken(Usuario usuario)
+        public async Task<string> RefreshToken(long usuarioId)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == usuarioId);
+            if (usuario == null)
+                throw new UnauthorizedAccessException("Usuário não encontrado.");
+            return await GenerateToken(usuario);
+        }
+
+        private async Task<string> GenerateToken(Usuario usuario)
         {
             var claims = new List<Claim>
             {
@@ -65,6 +73,12 @@ namespace ClienteService.Services
                 new Claim(ClaimTypes.Email, usuario.Email),
                 new Claim(ClaimTypes.Role, usuario.Role ?? "User")
             };
+
+            var cliente = await _context.Clientes.FirstOrDefaultAsync(c => c.UsuarioId == usuario.Id);
+            if (cliente != null)
+            {
+                claims.Add(new Claim("ClienteId", cliente.Id.ToString()));
+            }
 
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])
