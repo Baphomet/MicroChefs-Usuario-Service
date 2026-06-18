@@ -25,6 +25,7 @@ builder.Services.AddScoped<ClienteService.Services.ClienteService>();
 builder.Services.AddScoped<EnderecoService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<HistoricoPedidoService>();
+builder.Services.AddScoped<SettingsService>();
 builder.Services.AddSingleton<UserProducer>();
 builder.Services.AddHostedService<PedidoStatusConsumer>();
 
@@ -60,11 +61,17 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<Db>();
+    dbContext.Database.Migrate();
     await dbContext.Database.ExecuteSqlRawAsync("""
         DELETE u1 FROM Usuarios u1
         INNER JOIN Usuarios u2 ON u1.Email = u2.Email AND u1.Id < u2.Id
         """);
-    dbContext.Database.Migrate();
+
+    if (!dbContext.Settings.Any())
+    {
+        dbContext.Settings.Add(new ClienteService.Models.SystemSettings());
+        dbContext.SaveChanges();
+    }
 }
 
 // Configure the HTTP request pipeline.
