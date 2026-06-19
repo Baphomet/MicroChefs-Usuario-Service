@@ -33,7 +33,7 @@ on:
 env:
   AWS_REGION: us-east-2
   ECR_REPOSITORY: user-service
-  ECS_SERVICE: user-service
+  ECS_SERVICE: user-service-service-3dgftteo
   ECS_CLUSTER: microchefs-cluster
   ECS_TASK_DEFINITION: .aws/task-definition.json
   CONTAINER_NAME: user-service
